@@ -95,18 +95,18 @@ WITH
           FROM
             UNNEST(tags) ) )) AS focus_tags,
     FROM
-      `@{BILLING_TABLE}`), --updated table alias
+      `axmos-billing.FOCUS.gcp_billing_export_resource_v1_01D942_F9754A_251E73`), --updated table alias
       -- TODO - replace with your detailed usage export table path
     prices AS (
     SELECT
       *,
       flattened_prices
     FROM
-      `@{PRICING_TABLE}`, -- updated pricing alias
+      `axmos-billing.FOCUS.cloud_pricing_export`, -- updated pricing alias
       -- TODO - replace with your pricing export table path
       UNNEST(list_price.tiered_rates) AS flattened_prices
     WHERE
-      DATE(export_time) = '@{DATE}')
+      DATE(export_time) = '2025-01-01')
       -- TODO - replace with a date after you enabled pricing export to use pricing data as of this date
   SELECT
     usage_cost_data.location.zone AS AvailabilityZone,
@@ -115,7 +115,7 @@ WITH
         SUM(CAST(c.amount AS NUMERIC))
       FROM
         UNNEST(usage_cost_data.credits) AS c), 0) AS BilledCost,
-    "TODO - replace with the billing account ID in your detailed usage export table name" AS BillingAccountId,
+    "01D942-F9754A-251E73" AS BillingAccountId,
     usage_cost_data.currency AS BillingCurrency,
     PARSE_TIMESTAMP("%Y%m", invoice.month, "America/Los_Angeles") AS BillingPeriodStart,
     TIMESTAMP(DATE_SUB(DATE_ADD(PARSE_DATE("%Y%m", invoice.month), INTERVAL 1 MONTH), INTERVAL 1 DAY), "America/Los_Angeles") AS BillingPeriodEnd,
